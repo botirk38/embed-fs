@@ -9,7 +9,7 @@ use bincode::config;
 use bincode::serde::{decode_from_slice, encode_to_vec};
 
 fn db() -> Db {
-    sled::open("vectorfs_db").expect("Failed to open sled DB")
+    sled::open("embedfs_db").expect("Failed to open sled DB")
 }
 
 fn file_key<P: AsRef<Path>>(path: P) -> io::Result<Vec<u8>> {

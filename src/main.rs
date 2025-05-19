@@ -16,7 +16,13 @@ fn main() {
             fuser::mount2(fs, mountpoint, &[]).expect("Failed to mount filesystem");
         }
         Some(cli::Commands::Embed { file, vector }) => {
-            let vec: Vec<f32> = vector.split(',').filter_map(|s| s.parse().ok()).collect();
+            let vec = if let Some(text) = vector {
+                text.split(',')
+                    .filter_map(|s| s.trim().parse::<f32>().ok())
+                    .collect::<Vec<f32>>()
+            } else {
+                store::generate_embedding(file).expect("Failed to generate embedding")
+            };
 
             store::save_embedding(file, &vec).expect("Failed to save embedding");
         }

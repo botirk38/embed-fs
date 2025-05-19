@@ -17,7 +17,7 @@ pub enum Commands {
     },
     Embed {
         file: PathBuf,
-        vector: String,
+        vector: Option<String>,
     },
     Show {
         file: PathBuf,

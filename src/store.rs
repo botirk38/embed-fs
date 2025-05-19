@@ -7,6 +7,7 @@ use std::path::Path;
 
 use bincode::config;
 use bincode::serde::{decode_from_slice, encode_to_vec};
+use fastembed::{EmbeddingModel, InitOptions, TextEmbedding};
 
 fn db() -> Db {
     sled::open("embedfs_db").expect("Failed to open sled DB")
@@ -44,4 +45,19 @@ pub fn load_embedding<P: AsRef<Path>>(path: P) -> io::Result<Vec<f32>> {
             "No embedding found",
         ))
     }
+}
+
+pub fn generate_embedding<P: AsRef<Path>>(path: P) -> io::Result<Vec<f32>> {
+    let content = std::fs::read_to_string(path)?;
+
+    let model = TextEmbedding::try_new(
+        InitOptions::new(EmbeddingModel::AllMiniLML6V2).with_show_download_progress(true),
+    )
+    .map_err(|e| io::Error::new(io::ErrorKind::Other, e.to_string()))?;
+
+    let embeddings = model
+        .embed(vec![content], None)
+        .map_err(|e| io::Error::new(io::ErrorKind::Other, e.to_string()))?;
+
+    Ok(embeddings[0].clone())
 }
